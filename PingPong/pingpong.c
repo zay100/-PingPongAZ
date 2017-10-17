@@ -12,7 +12,7 @@ void SigHndlr(int s);
 
 int main(int argc, char *argv[])
 {
-	pid_t tmp_pid,son1_pid,son2_pid;
+	pid_t tmp_pid,son1_pid,son2_pid; // локальные сыновья чтобы их убить при завершении
 	int ball=0;
 	
 	
