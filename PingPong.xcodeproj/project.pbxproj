@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		55DD27341F964625001F73B6 /* pingpong.c in Sources */ = {isa = PBXBuildFile; fileRef = 55DD27331F964625001F73B6 /* pingpong.c */; };
+		55DD27361F9656A1001F73B6 /* pingpong.c in Sources */ = {isa = PBXBuildFile; fileRef = 55DD27351F9656A1001F73B6 /* pingpong.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +24,7 @@
 
 /* Begin PBXFileReference section */
 		55DD27291F9642B9001F73B6 /* PingPong */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PingPong; sourceTree = BUILT_PRODUCTS_DIR; };
-		55DD27331F964625001F73B6 /* pingpong.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pingpong.c; path = ../../TMP/pingpong.c; sourceTree = "<group>"; };
+		55DD27351F9656A1001F73B6 /* pingpong.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pingpong.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +57,7 @@
 		55DD272B1F9642B9001F73B6 /* PingPong */ = {
 			isa = PBXGroup;
 			children = (
-				55DD27331F964625001F73B6 /* pingpong.c */,
+				55DD27351F9656A1001F73B6 /* pingpong.c */,
 			);
 			path = PingPong;
 			sourceTree = "<group>";
@@ -119,7 +119,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55DD27341F964625001F73B6 /* pingpong.c in Sources */,
+				55DD27361F9656A1001F73B6 /* pingpong.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
