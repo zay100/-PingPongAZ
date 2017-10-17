@@ -6,17 +6,19 @@
 
 int fd[2];
 int stop;
-pid_t next_pid,my_pid;
+pid_t next_pid,my_pid,son1_pid,son2_pid,parent_pid;
 void SigHndlr(int s);
+void TarasBulba(int s);
 
 
 int main(int argc, char *argv[])
 {
-	pid_t tmp_pid,son1_pid,son2_pid; // локальные сыновья чтобы их убить при завершении
-	int ball=0;
+	pid_t tmp_pid;
+	int status,ball=0;
 	
 	
 	signal(SIGUSR1,SigHndlr);
+    signal(SIGUSR2,TarasBulba);
 	
 	if (argc<2)
 	{
@@ -25,9 +27,10 @@ int main(int argc, char *argv[])
 	}
 	
 	stop=atoi(argv[1]);
+    printf("stop %d\n",stop);
 	pipe(fd);
 	
- 	tmp_pid=getpid();
+ 	parent_pid=tmp_pid=getpid();
 	printf("\n Father PID=%d \n", tmp_pid);
 	
 	if (stop==0)
@@ -45,17 +48,16 @@ int main(int argc, char *argv[])
 	
 	if (!tmp_pid)
 	{		//we are in son1
-		my_pid=getpid();
-		printf("\n Son 1 born.  PID=%d \n", my_pid);
 		next_pid=getppid();
-		while (1);
-		
+        my_pid=getpid();
+		printf("\n I'm Son 1  PID=%d \n", my_pid);
+		for(;;);
 	}
 	
 	else
 	{		//we are in father with one son
-		next_pid=tmp_pid;  //второй сын будет отправлять мяч первому сыну
-		printf("Try to born 2-nd son. 1-st sin PID=%d\n",tmp_pid);
+		next_pid=son1_pid=tmp_pid;  //второй сын будет отправлять мяч первому сыну
+		// printf("Try to born 2-nd son. 1-st son PID=%d\n",tmp_pid);
 		tmp_pid=fork();
 	
 		if (tmp_pid==-1)
@@ -67,47 +69,64 @@ int main(int argc, char *argv[])
 		if (!tmp_pid)
 		{		//we are in son2
 			my_pid=getpid();
-			printf("\n Son 2 born. PID=%d \n", my_pid);
-			while (1);
+            //next_pid=getppid();
+            printf("\n I'm son 2. PID=%d \n", next_pid);
+            for(;;);
+          
 		}
 		else
 		{		//we are in father with two sons
 		
-			next_pid=tmp_pid;
+			next_pid=son2_pid=tmp_pid;
 			my_pid=getpid();
-			printf("\n I'm ready to start=%d Next is=%d\n", my_pid,next_pid);
+			sleep (1);
+            printf("\n I'm Father are ready to start. Next is=%d\n", next_pid);
 			write(fd[1], &ball, sizeof(int));
-			kill(next_pid,SIGUSR1);
-			while (1);
-		}
+            kill(next_pid,SIGUSR1);
+            for(;;);
+            
+        }
 	}
 }
 
 void SigHndlr(int s)
 {
-	int local_ball; // Локальный счетчик бросков "для честности"
+	signal(SIGUSR1,SigHndlr);
+    int local_ball; // Локальный счетчик бросков "для честности"
 	
-	printf("\nProcess %d got the signal, the next is %d\n", my_pid,next_pid);
+    //sleep(1);
+    
+	//printf("\nProcess %d got the signal %d, the next is %d\n", my_pid, s, next_pid);
 	if (read(fd[0],&local_ball,sizeof(int))<=0)
 	{
 		// посылается сигнал следующему по очереди процессу и закрывается текущий процесс
-			printf("\nClosing PID=%d  \n", my_pid);
-		kill(next_pid,SIGUSR1);
-		exit(0);
+        printf("\nCan not read from pipe.  \n");
+        kill(parent_pid,SIGUSR2);
+		return;
 	}
 	printf("\nPID %d got the ball #%d\n", my_pid,local_ball);
 	if (local_ball==stop)
 	{
 		printf("\nGame stopped at PID=%d  \n", my_pid);
 		close(fd[1]);
+        close(fd[0]);
+        if (my_pid==parent_pid) TarasBulba(1);
+        kill(parent_pid,SIGUSR2);
 	}
 	else
 	{
-		local_ball+=1;
+		local_ball++;
 		write(fd[1], &local_ball, sizeof(int));
+        //printf("Send next\n");
+        kill(next_pid,SIGUSR1);
 	}
-	// здесь послать сигнал действующему процессу
-	kill(next_pid,SIGUSR1);
-	
+}
+
+void TarasBulba(int s)
+{
+    //printf("\nProcess %d got the signal%d\n", my_pid, s);
+    kill(son1_pid,SIGINT);
+    kill(son2_pid,SIGINT);
+    exit(0);
 }
 
